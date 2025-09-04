@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: skyblue;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .screen { display: none; text-align: center; }
+    .active { display: block; }
+
+    h1 { color: #fff; }
+
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 18px;
+      border: 2px solid #fff;
+      border-radius: 10px;
+      background: transparent;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    button:hover { background: #fff; color: #333; }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 5px;
+      justify-content: center;
+      margin: 20px auto;
+    }
+    .cell {
+      background: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 36px;
+      cursor: pointer;
+      border-radius: 10px;
+    }
+
+    select {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #333;
+    }
+  </style>
+</head>
+<body>
+  <!-- Start Screen -->
+  <div id="startScreen" class="screen active">
+    <h1>Tic Tac Toe</h1>
+    <button onclick="startGame()">Start Game</button>
+    <button onclick="openSettings()">Settings</button>
+  </div>
+
+  <!-- Settings Screen -->
+  <div id="settingsScreen" class="screen">
+    <h1>Settings</h1>
+    <p>Choose Background Color:</p>
+    <select id="bgColor" onchange="changeColor()">
+      <option value="skyblue">Sky Blue</option>
+      <option value="pink">Pink</option>
+      <option value="lightgreen">Light Green</option>
+      <option value="lightyellow">Light Yellow</option>
+      <option value="lightgrey">Light Grey</option>
+      <option value="white">White</option>
+      <option value="black">Black</option>
+    </select>
+    <br><br>
+    <button onclick="backToMenu()">Back</button>
+  </div>
+
+  <!-- Game Screen -->
+  <div id="gameScreen" class="screen">
+    <h1>Tic Tac Toe</h1>
+    <div class="board" id="board"></div>
+    <button onclick="resetGame()">Restart</button>
+    <button onclick="backToMenu()">Back to Menu</button>
+  </div>
+
+  <script>
+    const startScreen = document.getElementById("startScreen");
+    const settingsScreen = document.getElementById("settingsScreen");
+    const gameScreen = document.getElementById("gameScreen");
+    const board = document.getElementById("board");
+
+    let currentPlayer = "X";
+    let gameActive = true;
+    let cells = Array(9).fill("");
+
+    function startGame() {
+      startScreen.classList.remove("active");
+      gameScreen.classList.add("active");
+      createBoard();
+    }
+
+    function openSettings() {
+      startScreen.classList.remove("active");
+      settingsScreen.classList.add("active");
+    }
+
+    function backToMenu() {
+      settingsScreen.classList.remove("active");
+      gameScreen.classList.remove("active");
+      startScreen.classList.add("active");
+      resetGame();
+    }
+
+    function changeColor() {
+      const color = document.getElementById("bgColor").value;
+      document.body.style.background = color;
+    }
+
+    function createBoard() {
+      board.innerHTML = "";
+      cells = Array(9).fill("");
+      gameActive = true;
+      currentPlayer = "X";
+
+      for (let i = 0; i < 9; i++) {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        cell.addEventListener("click", () => handleClick(i));
+        board.appendChild(cell);
+      }
+    }
+
+    function handleClick(index) {
+      if (!gameActive || cells[index] !== "") return;
+
+      cells[index] = currentPlayer;
+      board.children[index].textContent = currentPlayer;
+
+      if (checkWinner()) {
+        alert(`${currentPlayer} wins!`);
+        gameActive = false;
+        return;
+      }
+
+      if (!cells.includes("")) {
+        alert("It's a draw!");
+        gameActive = false;
+        return;
+      }
+
+      currentPlayer = currentPlayer === "X" ? "O" : "X";
+    }
+
+    function checkWinner() {
+      const winPatterns = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+      ];
+
+      return winPatterns.some(pattern => {
+        const [a,b,c] = pattern;
+        return cells[a] && cells[a] === cells[b] && cells[a] === cells[c];
+      });
+    }
+
+    function resetGame() {
+      createBoard();
+    }
+  </script>
+</body>
+</html>
